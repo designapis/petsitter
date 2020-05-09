@@ -1,0 +1,662 @@
+openapi: 3.0.0
+info:
+  title: Pet Sitter Service
+  version: "1.3"
+servers:
+- url: http://localhost:8080
+tags:
+- name: Users
+- name: Jobs
+paths:
+  /users:
+    post:
+      tags:
+      - Users
+      summary: Register User Account
+      operationId: post_users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      x-swagger-router-controller: Users
+  /users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Get User Information
+      operationId: get_users_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Users
+    put:
+      tags:
+      - Users
+      summary: Update User Account
+      operationId: put_users_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Users
+    delete:
+      tags:
+      - Users
+      summary: Delete User Account
+      operationId: delete_users_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Users
+  /users/{id}/jobs:
+    get:
+      tags:
+      - Jobs
+      - Users
+      summary: Get a list of Jobs that are associated with this user.
+      description: |
+        - **TODO** Find out about returing arrays directly (without being wrapped in an envelope).
+      operationId: get_jobs_for_user
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A list of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+                x-content-type: application/json
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+  /users/{id}/job-applications:
+    get:
+      tags:
+      - Jobs
+      - Users
+      summary: Get a list of Job Applications that are associated with this user.
+      operationId: get_job_applications_for_user
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A list of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobApplication'
+                x-content-type: application/json
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+  /jobs:
+    get:
+      tags:
+      - Jobs
+      summary: List available jobs
+      operationId: get_jobs
+      parameters:
+      - name: limit
+        in: query
+        description: Limits the number of results the endpoint returns.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50
+          minimum: 0
+          type: integer
+          default: 20
+      - name: offset
+        in: query
+        description: Skips these many items from the response.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+    post:
+      tags:
+      - Jobs
+      summary: Post new Job
+      operationId: post_jobs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+      responses:
+        "201":
+          description: Created
+          headers:
+            Location:
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+  /jobs/{id}:
+    get:
+      tags:
+      - Jobs
+      summary: Get Job Details
+      operationId: get_jobs_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+    put:
+      tags:
+      - Jobs
+      summary: Update Job Details
+      operationId: put_jobs_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+    delete:
+      tags:
+      - Jobs
+      summary: Remove Job
+      operationId: delete_jobs_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+  /jobs/{id}/job-applications:
+    get:
+      tags:
+      - Jobs
+      summary: Get all applications for this job.
+      operationId: get_applications_by_job_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobApplication'
+                x-content-type: application/json
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+    post:
+      tags:
+      - Jobs
+      summary: Create a job application
+      operationId: create_job_application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobApplication'
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobApplication'
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+  /job-applications/{id}:
+    put:
+      tags:
+      - Jobs
+      summary: Update application details
+      operationId: update_job_application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Update the application details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobApplication'
+      responses:
+        "200":
+          description: Job Application details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobApplication'
+                x-content-type: application/json
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+    delete:
+      tags:
+      - Jobs
+      summary: Delete application
+      operationId: delete_job_application
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Job application details
+      security:
+      - SimpleToken: []
+      x-swagger-router-controller: Jobs
+components:
+  schemas:
+    JobApplication:
+      title: JobApplication
+      type: object
+      properties:
+        id:
+          type: string
+          description: Job application id.
+          readOnly: true
+        user_id:
+          type: string
+          description: Id of user requesting job
+          readOnly: true
+        job_id:
+          type: string
+          description: Job id
+          readOnly: true
+        status:
+          type: string
+          default: APPLYING
+          enum:
+          - APPLYING
+          - ACCEPTED
+          - DENIED
+      example:
+        user_id: user_id
+        job_id: job_id
+        id: id
+        status: APPLYING
+    User:
+      title: User
+      required:
+      - email
+      - full_name
+      - roles
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        full_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        roles:
+          minLength: 1
+          type: array
+          items:
+            type: string
+            enum:
+            - PetOwner
+            - PetSitter
+            - Admin
+      example:
+        password: ""
+        full_name: full_name
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        roles:
+        - PetOwner
+        - PetOwner
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: id
+        email: ""
+    Job:
+      title: Job
+      required:
+      - activities
+      - description
+      - ends_at
+      - starts_at
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        creator_user_id:
+          type: string
+          description: The user who posted this job.
+          readOnly: true
+        worker_user_id:
+          type: string
+          description: When the job is open, null. When the job is filled, the user
+            who is working on it.
+          nullable: true
+          readOnly: true
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobApplication'
+        starts_at:
+          type: string
+          description: The date and time when this job starts.
+          format: date-time
+        ends_at:
+          type: string
+          description: The date and time when this job ends.
+          format: date-time
+        dog:
+          $ref: '#/components/schemas/Job_dog'
+        activities:
+          minLength: 1
+          type: array
+          items:
+            type: string
+            enum:
+            - walk
+            - dropin
+            - boarding
+            - sitting
+            - daycare
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        description:
+          type: string
+      example:
+        creator_user_id: creator_user_id
+        starts_at: 2000-01-23T04:56:07.000+00:00
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        worker_user_id: worker_user_id
+        activities:
+        - walk
+        - walk
+        created_at: 2000-01-23T04:56:07.000+00:00
+        description: description
+        id: id
+        ends_at: 2000-01-23T04:56:07.000+00:00
+        dog:
+          size: small
+          name: name
+          years_old: 0
+          breed: breed
+        applications:
+        - user_id: user_id
+          job_id: job_id
+          id: id
+          status: APPLYING
+        - user_id: user_id
+          job_id: job_id
+          id: id
+          status: APPLYING
+    inline_response_200:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Job'
+        total_items:
+          type: integer
+          description: The total number of items, regardless of how many this response
+            includes.
+        has_more:
+          type: boolean
+          description: Indicates that more items are available and can be retrieved
+            with different offset and limit parameters.
+      example:
+        has_more: true
+        items:
+        - creator_user_id: creator_user_id
+          starts_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          worker_user_id: worker_user_id
+          activities:
+          - walk
+          - walk
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          id: id
+          ends_at: 2000-01-23T04:56:07.000+00:00
+          dog:
+            size: small
+            name: name
+            years_old: 0
+            breed: breed
+          applications:
+          - user_id: user_id
+            job_id: job_id
+            id: id
+            status: APPLYING
+          - user_id: user_id
+            job_id: job_id
+            id: id
+            status: APPLYING
+        - creator_user_id: creator_user_id
+          starts_at: 2000-01-23T04:56:07.000+00:00
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          worker_user_id: worker_user_id
+          activities:
+          - walk
+          - walk
+          created_at: 2000-01-23T04:56:07.000+00:00
+          description: description
+          id: id
+          ends_at: 2000-01-23T04:56:07.000+00:00
+          dog:
+            size: small
+            name: name
+            years_old: 0
+            breed: breed
+          applications:
+          - user_id: user_id
+            job_id: job_id
+            id: id
+            status: APPLYING
+          - user_id: user_id
+            job_id: job_id
+            id: id
+            status: APPLYING
+        total_items: 0
+    Job_dog:
+      required:
+      - breed
+      - size
+      - years_old
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: string
+          enum:
+          - small
+          - medium
+          - large
+        years_old:
+          type: integer
+        breed:
+          type: string
+      example:
+        size: small
+        name: name
+        years_old: 0
+        breed: breed
+  securitySchemes:
+    SimpleToken:
+      type: http
+      description: Use the `email`:`password` as the Basic Auth
+      scheme: basic

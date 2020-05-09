@@ -1,0 +1,61 @@
+{
+  "name": "petsitter-web",
+  "version": "0.1.0",
+  "private": true,
+  "openapiUrl": "https://api.swaggerhub.com/apis/ponelat/pet-sitter/1.3",
+  "proxy": "http://localhost:8080",
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/hookrouter": "^2.2.1",
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-redux": "^7.1.7",
+    "@types/redux-logger": "^3.0.7",
+    "@types/styled-components": "^5.0.1",
+    "grommet": "^2.13.0",
+    "grommet-controls": "^2.0.4",
+    "grommet-icons": "^4.4.0",
+    "hookrouter": "^1.2.3",
+    "isomorphic-fetch": "^2.2.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-redux": "^7.2.0",
+    "react-scripts": "3.4.0",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.0.1",
+    "typescript": "~3.7.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "openapi": "node ./fetch-openapi.js",
+    "prism": "npm run openapi && prism mock -p 8080 ./pet-sitter.yaml",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@stoplight/prism-http": "^3.3.2",
+    "redux-devtools-extension": "^2.13.8"
+  }
+}
