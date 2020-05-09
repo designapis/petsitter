@@ -1,1 +1,16 @@
-.git
+**/*
+
+!backend/api
+!backend/controllers
+!backend/index.js
+!backend/models
+!backend/package.json
+!backend/package-lock.json
+!backend/service
+!backend/utils
+
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/public
+!frontend/src
+!frontend/tsconfig.json

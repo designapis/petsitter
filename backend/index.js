@@ -1,25 +1,31 @@
 'use strict';
 
-var path = require('path');
-var http = require('http');
-var auth = require('./utils/auth');
+const path = require('path');
+const http = require('http');
+const auth = require('./utils/auth');
+const express = require('express');
 
-var oas3Tools = require('oas3-tools');
-var serverPort = 8080;
+const oas3Tools = require('oas3-tools');
+const serverPort = 8080;
 
 //const databaseUrl = 'mongodb://127.0.0.1/petsitter_db';
 const databaseUrl = 'mongodb://petsitter-db/petsitter_db';
 const mongoose = require('mongoose');
 
 // swaggerRouter configuration
-var options = {
+const options = {
     controllers: path.join(__dirname, './controllers')
 };
 
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
+const expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
 expressAppConfig.addValidator();
-var app = expressAppConfig.getApp();
+const app = expressAppConfig.getApp();
+
 app.use(auth.basicUserAuth);
+app.use(express.static(path.join(__dirname, './build')));
+app.get(/\/app\/?.*/, (req, res, next) => {
+  res.sendFile(path.join(__dirname, './build/index.html'))
+})
 
 mongoose.connect(databaseUrl, {
   useNewUrlParser: true,

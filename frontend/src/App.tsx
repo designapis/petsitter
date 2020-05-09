@@ -1,6 +1,6 @@
 import React from 'react'
 import { createGlobalStyle } from 'styled-components'
-import {usePath, navigate, useRoutes, useInterceptor} from 'hookrouter';
+import {usePath, navigate, useRoutes, useInterceptor, setBasepath} from 'hookrouter';
 
 import { Grommet, Grid, Main, Box, Heading } from 'grommet'
 import { Notification } from 'grommet-controls'
@@ -47,6 +47,8 @@ const Home = (props: any) => {
   }
   return null
 }
+
+setBasepath('/app')
 
 function App(props: Props) {
 

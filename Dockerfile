@@ -4,44 +4,36 @@ RUN apk update && \
     apk upgrade && \
     apk add --no-cache git
 
-RUN mkdir /app
-WORKDIR /app
-
 # ------- Get the dependencies
+FROM base as backend-deps
 
-FROM base as deps
-# https://stackoverflow.com/questions/33322103/multiple-froms-what-it-means
+RUN mkdir -p /backend
+WORKDIR /backend
 
-COPY package.json .
-COPY package-lock.json .
+COPY backend/package.json .
+COPY backend/package-lock.json .
+
 RUN NODE_ENV=development npm ci
 
-# ------- SPA Builder image
+# ------- Frontend (SPA) Builder image
 
-# FROM deps as build
+FROM base as frontend
 
-# COPY src/ ./src
-# COPY public/ ./public
-# COPY tsconfig.json .
-# COPY config-overrides.js .
-
-# RUN NODE_ENV=production npm run build
+COPY frontend /frontend
+WORKDIR /frontend
+RUN NODE_ENV=development npm ci
+RUN NODE_ENV=production npm run build
 
 # ------- Production image
+FROM base
 
-FROM deps
+COPY backend /app
+WORKDIR /app
 
-# COPY --from=build ./app/build /app/build
-COPY api ./api
-COPY controllers ./controllers
-COPY models ./models
-COPY node_modules ./node_modules
-COPY service ./service
-COPY utils ./utils
-COPY index.js ./index.js
+COPY --from=frontend /frontend/build /app/build
+COPY --from=backend-deps /backend/node_modules /app/node_modules
 
 ENV NODE_ENV=production
-
 RUN npm prune --production
 
 CMD ["node", "index.js"]
