@@ -1,13 +1,15 @@
 import fetch from 'isomorphic-fetch'
 import { User, JobsPage, Job, JobApplication } from './types'
 
-// @me - a magic ID that refers to the user idenitifed by the Authorization header
-const ME = '%40me'
+const ME = '%40me';
 
 export class PetSitterAPI {
   url: string;
   email?: string;
   password?: string;
+
+// @me - a magic ID that refers to the user idenitifed by the Authorization header
+  ME = ME;
 
   constructor(url: string) {
     this.url = url
@@ -64,9 +66,16 @@ export class PetSitterAPI {
     })
   }
 
-  async getUser(id: string) : Promise<User> {
+  authHeaderFromUser(user: User): string {
+    return  `Basic ${btoa(`${user.email}:${user.password}`)}`
+  }
+
+  async getUser(id: string, user?: User) : Promise<User> {
+    const headers = this.headers()
+    if(user)
+      headers.set('Authorization', this.authHeaderFromUser(user))
     return fetch(`${this.url}/users/${id}`, {
-      headers: this.headers()
+      headers,
     }).then((res: Response) => {
       if(res.status !== 200)
         throw new Error(`Failed to fetch user ${id}`)
