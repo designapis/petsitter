@@ -5,20 +5,24 @@ import { connect } from 'react-redux'
 import { login, signup } from './duck-user'
 import Profile from './Profile'
 import { User } from './types'
+import { setError } from './duck-error'
 
 interface Props {
   login: Function;
   signup : Function;
+  setError: Function;
 }
 
 export function LoginPage(props: Props) {
 
-  const { signup, login } = props
+  const { signup, login, setError } = props
 
   const onLogin = (form: any) => {
     const {email, password} : User = form.value
     login({email,password}).then(() => {
       navigate('/')
+    }).catch((e: Error) => {
+      setError("Invalid email/password")
     })
   }
 
@@ -51,4 +55,5 @@ export default connect((state) => {
 }, {
   login,
   signup,
+  setError,
 })(LoginPage)

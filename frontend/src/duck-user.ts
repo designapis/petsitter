@@ -27,16 +27,6 @@ export function hasPetOwnerRole(user: User) {
 
 // Action Creators
 
-export function getCurrentUser()  : Dispatcher {
-  return (dispatch) => {
-    return Api.getUser('@me').then((fetchedUser) => {
-      return dispatch(storeUser(fetchedUser))
-    }).catch(err => {
-      dispatch(setError(err))
-    })
-  }
-}
-
 export function storeUser(user: User) : Dispatcher {
   return (dispatch, getState) => {
     const existingUser = getState().user || <User> JSON.parse(localStorage.getItem('user') || '{}')
@@ -55,9 +45,22 @@ export function setUser(user: User) : Message<User> {
 // Async Actions
 export function login(user: User) : Dispatcher {
   return async (dispatch) => {
-    Api.setSimpleToken(user.email, user.password)
-    dispatch(setUser(user))
-    return dispatch(getCurrentUser())
+    return Api.getUser(Api.ME, user).then((fetchedUser: User) => {
+      fetchedUser.password = user.password
+      Api.setSimpleToken(user.email, user.password)
+      storeUser(fetchedUser)
+      return dispatch(setUser(fetchedUser))
+    })
+  }
+}
+
+export function getCurrentUser()  : Dispatcher {
+  return (dispatch) => {
+    return Api.getUser('@me').then((fetchedUser) => {
+      return dispatch(storeUser(fetchedUser))
+    }).catch(err => {
+      dispatch(setError(err))
+    })
   }
 }
 

@@ -16,6 +16,7 @@ import Notifications from './Notifications'
 import { logout } from './duck-user'
 import { connect } from 'react-redux'
 import {RootState, User} from './types'
+import { clearError } from './duck-error';
 
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
@@ -34,6 +35,7 @@ const PageNotFound = () => (
 interface Props {
   user: User;
   logout: Function;
+  clearError: Function;
 }
 
 const Home = (props: any) => {
@@ -69,6 +71,7 @@ function App(props: Props) {
   } // End of Routes
 
   useInterceptor((currentPath: string, nextPath: string) => {
+    props.clearError()
     if(nextPath === '/logout') {
       props.logout()
       return '/'
@@ -116,5 +119,6 @@ export default connect((state: RootState)=>{
     user: state.user
   }
 }, {
-  logout
+  logout,
+  clearError,
 })(App)
