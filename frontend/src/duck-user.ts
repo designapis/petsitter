@@ -48,8 +48,7 @@ export function login(user: User) : Dispatcher {
     return Api.getUser(Api.ME, user).then((fetchedUser: User) => {
       fetchedUser.password = user.password
       Api.setSimpleToken(user.email, user.password)
-      storeUser(fetchedUser)
-      return dispatch(setUser(fetchedUser))
+      return dispatch(storeUser(fetchedUser))
     })
   }
 }
