@@ -52,30 +52,43 @@ const Home = (props: any) => {
 
 setBasepath('/app')
 
+const isLoggedIn = () => {
+  return !!localStorage.getItem('user')
+}
+
+function requiresAuth(routeFn: Function) {
+  return (...args: any[]) => {
+    if(isLoggedIn())
+      return routeFn(...args)
+    return navigate('/login')
+  }
+}
+
 function App(props: Props) {
 
   const routes = {
+    '': () => <Home user={props.user}/>,
     '/': () => <Home user={props.user}/>,
     '/login': () => <Login/>,
     '/logout': () => {
       props.logout()
-      navigate('/')
+      navigate('/login')
       return null
     },
-    '/jobs': () => <JobsPage/>,
-    '/jobs/mine': () => <MyJobsPage/>,
-    '/job-applications': () => <JobApplicationsPage/>,
-    '/jobs-new': () => <JobPage />,
-    '/jobs/:id': ({id}: any) => <JobPage jobId={id} />,
-    '/profile': () => <ProfilePage/>,
+    '/jobs': requiresAuth(() => <JobsPage/>), // TODO: This should require auth??
+    '/jobs/mine': requiresAuth(() => <MyJobsPage/>),
+    '/job-applications': requiresAuth(() => <JobApplicationsPage/>),
+    '/jobs-new': requiresAuth(() => <JobPage />),
+    '/jobs/:id': requiresAuth(({id}: any) => <JobPage jobId={id} />),
+    '/profile': requiresAuth(() => <ProfilePage/>),
   } // End of Routes
 
   useInterceptor((currentPath: string, nextPath: string) => {
     props.clearError()
-    if(nextPath === '/logout') {
-      props.logout()
-      return '/'
-    }
+    // if(nextPath === '/logout') {
+    //   props.logout()
+    //   return '/'
+    // }
     return nextPath
   })
 
