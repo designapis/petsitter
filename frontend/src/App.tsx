@@ -85,10 +85,6 @@ function App(props: Props) {
 
   useInterceptor((currentPath: string, nextPath: string) => {
     props.clearError()
-    // if(nextPath === '/logout') {
-    //   props.logout()
-    //   return '/'
-    // }
     return nextPath
   })
 
