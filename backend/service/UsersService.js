@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const base64 = require('base-64');
 const problem = require('../utils/problem');
 const UserModel = mongoose.model('User', require('../models/User').User);
 
@@ -122,4 +123,28 @@ exports.put_users_id = async function(body, id, accessingUser) {
     }
 
     return user.toResultFormat();
+}
+
+/**
+ * Start User Session
+ * 
+ * body User info
+ */
+module.exports.startSession = async function startSession(body) {
+    let results = null;
+    try {
+        results = await UserModel.find({ email : body.email });
+    } catch (error) {
+        throw new problem.Problem(problem.E_SERVER_FAULT,
+            "Invalid username or password.");
+    }
+
+    if (results.length == 0 || results[0].password != body.password)
+        throw new problem.Problem(problem.E_UNAUTHORIZED,
+            "Invalid username or password.");
+    
+    return {
+        user_id : results[0]._id,
+        auth_header : "Bearer " + base64.encode(results[0]._id + ":" + body.password)
+    }
 }

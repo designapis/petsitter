@@ -53,3 +53,14 @@ module.exports.put_users_id = function put_users_id (req, res, next, body, id) {
       problem.toResponse(res);
     });
 };
+
+module.exports.startSession = function startSession(req, res, next, body) {
+  Users.startSession(body)
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (problem) {
+      console.log(problem);
+      problem.toResponse(res);
+    });
+}

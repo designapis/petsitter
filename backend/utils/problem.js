@@ -1,7 +1,8 @@
-exports.E_NOT_FOUND = 'https://petsitter.example.com/probs/not-found';
-exports.E_UNAUTHORIZED = 'https://petsitter.example.com/probs/unauthorized';
-exports.E_FORBIDDEN = 'https://petsitter.example.com/probs/forbidden';
-exports.E_SERVER_FAULT = 'https://petsitter.example.com/probs/server-fault';
+exports.E_BAD_REQUEST = 'https://petsitter.designapis.com/problem/bad-request';
+exports.E_NOT_FOUND = 'https://petsitter.designapis.com/problem/not-found';
+exports.E_UNAUTHORIZED = 'https://petsitter.designapis.com/problem/unauthorized';
+exports.E_FORBIDDEN = 'https://petsitter.designapis.com/problem/forbidden';
+exports.E_SERVER_FAULT = 'https://petsitter.designapis.com/problem/server-fault';
 
 exports.Problem = class Problem extends Error {
     
@@ -15,6 +16,9 @@ exports.Problem = class Problem extends Error {
         let code = 500;
 
         switch (this.type) {
+            case exports.E_BAD_REQUEST:
+                code = 400;
+                break;
             case exports.E_NOT_FOUND:
                 code = 404;
                 break;
@@ -29,6 +33,7 @@ exports.Problem = class Problem extends Error {
         // Payload according to: https://tools.ietf.org/html/rfc7807
         const payload = {
             type : this.type,
+            status : code,
             title : this.title
         };
         response.writeHead(code, { 'Content-Type': 'application/problem+json' });
