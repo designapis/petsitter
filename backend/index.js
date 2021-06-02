@@ -8,8 +8,7 @@ const express = require('express');
 const oas3Tools = require('oas3-tools');
 const serverPort = 8080;
 
-//const databaseUrl = 'mongodb://127.0.0.1/petsitter_db';
-const databaseUrl = process.env.DB_URL || 'mongodb://petsitter-db/petsitter_db';
+const databaseUrl = process.env.DB_URL || 'mongodb://127.0.0.1/petsitter_db';
 const mongoose = require('mongoose');
 
 // swaggerRouter configuration
