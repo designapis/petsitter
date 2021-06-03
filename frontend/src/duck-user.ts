@@ -1,7 +1,8 @@
 // Actions
-import { User,  Message, Dispatcher, GetState } from './types'
+import { User, Message, Dispatcher, GetState, UserSession } from './types'
 import { setError }  from './duck-error'
 import Api from './api'
+import { Session } from 'inspector'
 
 const SET = 'user/SET'
 const PET_SITTER = 'PetSitter'
@@ -27,29 +28,31 @@ export function hasPetOwnerRole(user: User) {
 
 // Action Creators
 
-export function storeUser(user: User) : Dispatcher {
+export function storeUser(user: UserSession) : Dispatcher {
   return (dispatch, getState) => {
     const existingUser = getState().user || <User> JSON.parse(localStorage.getItem('user') || '{}')
     // Keep the password when we're updating the user
     if(existingUser.password && !user.password)
       user.password = existingUser.password
-    localStorage.setItem('user', JSON.stringify(user))
-    dispatch(setUser(user))
+    const newUser = {...existingUser, ...user}
+    localStorage.setItem('user', JSON.stringify(newUser))
+    Api.setAuthHeader(newUser.token)
+    dispatch(setUser(newUser))
   }
 }
 
-export function setUser(user: User) : Message<User> {
+export function setUser(user: UserSession) : Message<User> {
   return { type: SET, payload: user }
 }
 
 // Async Actions
 export function login(user: User) : Dispatcher {
   return async (dispatch) => {
-    return Api.getUser(Api.ME, user).then((fetchedUser: User) => {
-      fetchedUser.password = user.password
-      Api.setSimpleToken(user.email, user.password)
-      return dispatch(storeUser(fetchedUser))
-    })
+    return Api.createSession(user.email, user.password)
+      .then((session) => {
+        dispatch(storeUser({...user, token: session.auth_header}))
+        return dispatch(getCurrentUser())
+      })
   }
 }
 
@@ -57,8 +60,6 @@ export function getCurrentUser()  : Dispatcher {
   return (dispatch) => {
     return Api.getUser('@me').then((fetchedUser) => {
       return dispatch(storeUser(fetchedUser))
-    }).catch(err => {
-      dispatch(setError(err))
     })
   }
 }
@@ -66,8 +67,7 @@ export function getCurrentUser()  : Dispatcher {
 export function signup(user: User) : Dispatcher {
   return async (dispatch) => {
     return Api.createUser(user).then(() => {
-      Api.setSimpleToken(user.email, user.password)
-      return dispatch(storeUser(user))
+      return login(user)
     }).catch(err => {
       dispatch(setError(err))
       throw err
@@ -78,8 +78,7 @@ export function signup(user: User) : Dispatcher {
 export function updateUser(user: User) : Dispatcher {
   return async (dispatch) => {
     return Api.updateUser(user).then((fetchedUser) => {
-      Api.setSimpleToken(fetchedUser.email, user.password)
-      dispatch(storeUser(fetchedUser))
+      return login(fetchedUser)
     }).catch((err: any) => {
       dispatch(setError(err))
       throw err
@@ -100,7 +99,7 @@ export function deleteUser(id: string = "@me") : Dispatcher {
 
 export function logout() : Dispatcher {
   return async (dispatch) => {
-    Api.clearSimpleToken()
+    Api.clearAuthHeader()
     localStorage.removeItem('user')
     dispatch(setUser({}))
   }

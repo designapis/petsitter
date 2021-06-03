@@ -24,6 +24,44 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
+interface IErrorState {
+  error: Error | null
+}
+
+class ErrorBoundary extends React.Component<any, IErrorState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      error: null
+    }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    // Update state so the next render will show the fallback UI.
+    return { error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    // You can also log the error to an error reporting service
+    console.error(error, errorInfo)
+    localStorage.clear()
+  }
+
+  render() {
+    if (this.state.error) {
+      // You can render any custom fallback UI
+      return (
+        <div>
+          <h1>Something went wrong</h1>
+          <pre>{this.state.error.message}</pre>
+        </div>
+      )
+    }
+
+    return this.props.children;
+  }
+}
+
 const theme = {
 
 }
@@ -113,7 +151,9 @@ function App(props: Props) {
           </Box>
 
           <Main gridArea="main" direction="row" alignContent="end" gap="small" >
-            {route || <PageNotFound/>}
+            <ErrorBoundary >
+              {route || <PageNotFound/>}
+            </ErrorBoundary>
           </Main>
           <Box gridArea="footer" background="light-2" >
           </Box>

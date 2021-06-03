@@ -9,17 +9,17 @@ import * as DuckUser from './duck-user'
 import * as DuckJobs from './duck-jobs'
 import * as DuckError from './duck-error'
 import configureStore from './configureStore'
-import { User } from './types'
+import { User, UserSession } from './types'
 import Api from './api'
 
-let user : User = {}
+let user : UserSession = {}
 try {
   user = JSON.parse(localStorage.getItem('user') || '{}')
 
   // Clear bad users
-  if(!user.password)
+  if(!user.token)
     localStorage.removeItem('user')
-  Api.setSimpleToken(user.email, user.password)
+  Api.setAuthHeader(user.token)
 } catch(e) {
   console.error(e)
 }

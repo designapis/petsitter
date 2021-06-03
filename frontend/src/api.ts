@@ -1,12 +1,12 @@
 import fetch from 'isomorphic-fetch'
-import { User, JobsPage, Job, JobApplication } from './types'
+import { User, JobsPage, Job, JobApplication, Session } from './types'
+
 
 const ME = '%40me';
 
 export class PetSitterAPI {
   url: string;
-  email?: string;
-  password?: string;
+  token?: string;
 
 // @me - a magic ID that refers to the user idenitifed by the Authorization header
   ME = ME;
@@ -15,19 +15,17 @@ export class PetSitterAPI {
     this.url = url
   }
 
-  setSimpleToken(email?: string, password?: string) {
-    this.email = email
-    this.password = password
+  setAuthHeader(token?: string) {
+    this.token = token
   }
 
-  clearSimpleToken() {
-    this.email = ''
-    this.password = ''
+  clearAuthHeader() {
+    this.token = ''
   }
 
   headers(emptyBody?: boolean) : Headers {
     const headers = new Headers({
-      "Authorization": `Basic ${btoa(`${this.email}:${this.password}`)}`,
+      "Authorization": `${this.token}`
     })
     if(!emptyBody)
       headers.append("Content-Type", 'application/json')
@@ -66,16 +64,9 @@ export class PetSitterAPI {
     })
   }
 
-  authHeaderFromUser(user: User): string {
-    return  `Basic ${btoa(`${user.email}:${user.password}`)}`
-  }
-
   async getUser(id: string, user?: User) : Promise<User> {
-    const headers = this.headers()
-    if(user)
-      headers.set('Authorization', this.authHeaderFromUser(user))
     return fetch(`${this.url}/users/${id}`, {
-      headers,
+      headers: this.headers(),
     }).then((res: Response) => {
       if(res.status !== 200)
         throw new Error(`Failed to fetch user ${id}`)
@@ -89,13 +80,11 @@ export class PetSitterAPI {
     }).then((res: Response) => res.json())
   }
 
-
   async getMyJobs() : Promise<Job[]> {
     return fetch(`${this.url}/users/${ME}/jobs`, {
       headers: this.headers()
     }).then((res: Response) => res.json())
   }
-
 
   async updateJob(jobId: string, job: Job) : Promise<Job> {
     return fetch(`${this.url}/jobs/${jobId}`, {
@@ -168,9 +157,24 @@ export class PetSitterAPI {
     })
   }
 
+  async createSession(email?: string, password?: string) : Promise<Session> {
+    return fetch(`${this.url}/sessions`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        email, password
+      }),
+    }).then((res: Response) => {
+      if(!res.ok)
+        throw new Error(`Failed to login user ${email}`)
+      return res.json()
+    })
+  }
 }
 
-const instance = new PetSitterAPI('')
+const instance = new PetSitterAPI('/api')
 // Used to extend the Window object
 
 declare global {

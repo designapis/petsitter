@@ -2,8 +2,6 @@ import React, {useState} from 'react'
 import {Form, FormField, Button, Box, Heading} from 'grommet'
 import SelectWithBoxes from './SelectWithBoxes'
 
-// import * as userActions from './redux/modules/user'
-
 import { User } from './types'
 
 interface Props {

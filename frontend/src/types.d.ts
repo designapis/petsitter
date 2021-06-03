@@ -19,6 +19,19 @@ export interface User {
   roles?: string[];
 }
 
+export interface UserSession extends User {
+  token?: string;
+}
+
+export interface Session {
+  user_id: string;
+  auth_header: string;
+}
+
+export interface Auth {
+  bearerToken?: string;
+}
+
 export interface Dog {
   name: string;
   size?: string;
