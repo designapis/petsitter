@@ -1,0 +1,85 @@
+version: 2
+
+variables:  # Define variables here
+  email: bob@example.com
+
+requests:
+  createUser:
+    request:
+      url: '<$ Env("URL") $>/users'
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          email: <$ email $>
+          full_name: <$ Faker("name.findName") $>
+          password: password
+          roles:
+          - PetOwner
+    validate:
+    - jsonpath: status
+      expect: 201
+
+  createSession:
+    request:
+      url: '<$ Env("URL") $>/sessions'
+      method: POST
+      postData:
+        mimeType: application/json
+        text:
+          email: <$ email $>
+          password: pass
+    validate:
+    - jsonpath: status
+      expect: 200
+
+  getUser:
+    request:
+      url: '<$ Env("URL") $>/users/%40me'
+      method: GET
+      headers:
+        - name: Authorization
+          value: <$ createSession.content.auth_header $>
+    validate:
+    - jsonpath: status
+      expect: 200
+
+  createJob:
+    request:
+      url: '<$ Env("URL") $>/jobs'
+      method: POST
+      headers:
+        - name: Authorization
+          value: <$ createSession.content.auth_header $>
+      postData:
+        mimeType: application/json
+        text:
+          activities: [walk]
+          description: A friendly pooch
+          ends_at: 2021-01-01T00:00:00
+          starts_at: 2021-02-01T00:00:00
+    validate:
+    - jsonpath: status
+      expect: 201
+
+  getJobFromLocation:
+    request:
+      url: '<$ Env("URL") $><$ createJob.headers.location $>'
+      method: GET
+      headers:
+        - name: Authorization
+          value: <$ createSession.content.auth_header $>
+    validate:
+    - jsonpath: content.description
+      expect: A friendly pooch
+
+  getJob:
+    request:
+      url: '<$ Env("URL") $>/jobs/<$ getJobFromLocation.content.id $>'
+      method: GET
+      headers:
+        - name: Authorization
+          value: <$ createSession.content.auth_header $>
+    validate:
+    - jsonpath: content.description
+      expect: A friendly pooch
