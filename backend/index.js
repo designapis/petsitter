@@ -14,18 +14,30 @@ const mongoose = require('mongoose');
 
 // swaggerRouter configuration
 const options = {
-    controllers: path.join(__dirname, './controllers')
+    routing : {
+      controllers: path.join(__dirname, './controllers')
+    }
 };
 
 const expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
-expressAppConfig.addValidator();
 const app = expressAppConfig.getApp();
 
+// Beginning of Frontend integration rules
+
 app.use(auth.basicUserAuth);
-app.use(express.static(path.join(__dirname, './build')));
+app.use('/', express.static(path.join(__dirname, '../frontend/build')));
 app.get(/\/app\/?.*/, (req, res, next) => {
-  res.sendFile(path.join(__dirname, './build/index.html'))
-})
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'))
+});
+
+// End of Frontend integration rules
+
+// Fix for https://github.com/bug-hunters/oas3-tools/issues/41:
+const stack = app._router.stack;
+const lastEntries = stack.splice(app._router.stack.length - 3); 
+const firstEntries = stack.splice(0, 5);
+app._router.stack = [...firstEntries, ...lastEntries, ...stack];
+
 
 mongoose.connect(databaseUrl, {
   useNewUrlParser: true,
