@@ -30,7 +30,7 @@ FROM base
 COPY backend /app
 WORKDIR /app
 
-COPY --from=frontend /frontend/build /app/build
+COPY --from=frontend /frontend/build /frontend/build
 COPY --from=backend-deps /backend/node_modules /app/node_modules
 
 ENV NODE_ENV=production
